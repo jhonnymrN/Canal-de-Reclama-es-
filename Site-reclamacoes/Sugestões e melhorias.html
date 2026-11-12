@@ -74,7 +74,7 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
     erro("eCpf","");this.removeAttribute("aria-invalid");
   });
   var captchaConfig=window.CENTRAL_CAPTCHA||{}, captchaToken="", captchaWidget=null;
-  var captchaEnabled=!!captchaConfig.siteKey;
+  var captchaEnabled=!!(captchaConfig.enabled&&captchaConfig.siteKey);
   function resetCaptcha(){
     captchaToken="";
     if(window.turnstile&&captchaWidget!==null)window.turnstile.reset(captchaWidget);
