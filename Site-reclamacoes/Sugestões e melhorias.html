@@ -120,7 +120,7 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){erro("eEmail","Informe um e-mail válido.");ok=false}
     if(cpf&&!validarCPF(cpf)){erro("eCpf",window.CPF?"O CPF informado não é válido. Confira os números.":"Não foi possível carregar a validação de CPF. Recarregue a página.");$("cpf").setAttribute("aria-invalid","true");ok=false}
     if(telefone&&telefone.length!==10&&telefone.length!==11){erro("eGeral","Informe um telefone com DDD válido ou deixe o campo em branco.");ok=false}
-    if(texto.length<20){erro("eTexto","Descreva sua manifestação (mínimo de 20 caracteres).");ok=false}
+    if(texto.length===0){erro("eTexto","Descreva sua manifestação.");ok=false}
     if(!$("lgpd").checked){erro("eLgpd","É necessário autorizar o uso dos dados.");ok=false}
     if(captchaEnabled&&!captchaToken){erro("eCaptcha","Conclua a verificação de segurança antes de enviar.");ok=false}
     if(!ok)return;

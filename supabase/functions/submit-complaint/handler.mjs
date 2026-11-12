@@ -25,7 +25,7 @@ export function createHandler(env, {fetch: request = fetch, validateCPF} = {}) {
     const text = name => typeof input[name] === 'string' ? input[name].trim() : '';
     const nome = text('nome').replace(/\s+/g, ' '), email = text('email'), cpf = text('cpf'), telefone = text('telefone'), assunto = text('assunto'), texto = text('texto'), token = text('captchaToken');
     const assuntos = ['Atendimento','Conteúdo / aulas','Professores / instrutores','Plataforma / acesso','Financeiro / pagamentos','Outros'];
-    if (nome.length < 5 || nome.length > 120 || !nome.includes(' ') || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || texto.length < 20 || texto.length > 5000 || !assuntos.includes(assunto) || input.consentimento !== true) return reply(400, 'invalid_fields');
+    if (nome.length < 5 || nome.length > 120 || !nome.includes(' ') || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || texto.length < 1 || texto.length > 5000 || !assuntos.includes(assunto) || input.consentimento !== true) return reply(400, 'invalid_fields');
     if ((cpf && (!/^\d{11}$/.test(cpf) || !validateCPF(cpf))) || (telefone && !/^\d{10,11}$/.test(telefone))) return reply(400, 'invalid_contact');
     if (!token || token.length > 2048) return reply(403, 'captcha_required');
     try {
