@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Painel administrativo — Central de Sugestões</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#1b2233;--mu:#5d667a;--bd:#d9deea;--ac:#2f5bea;--ok:#127a4b;--er:#c0262d;box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141f;--card:#1a2030;--tx:#e8ecf6;--mu:#98a2b8;--bd:#2b3348;--ac:#6f8dff;--ok:#4cc38a;--er:#ff7a80;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:24px 16px 48px}h1{font-size:1.6rem;margin:8px 0 4px}.sub{color:var(--mu);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:16px}
+label{display:block;font-weight:600;margin:14px 0 6px}input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--ac);border-color:transparent}textarea{min-height:160px;resize:vertical}
+.hint,.meta{font-size:.85rem;color:var(--mu)}.err{color:var(--er);font-size:.85rem;margin-top:4px;min-height:1em}
+.chk{display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:.9rem;color:var(--mu)}.chk input{width:auto;margin-top:4px}
+button{margin-top:18px;width:100%;padding:13px;border:0;border-radius:10px;background:var(--ac);color:white;font:inherit;font-weight:700;cursor:pointer}
+button.secondary{background:transparent;color:var(--tx);border:1px solid var(--bd)}button:disabled{opacity:.5;cursor:not-allowed}
+.ok{color:var(--ok);font-weight:600}.item{border-top:1px solid var(--bd);padding:14px 0}.item:first-child{border-top:0}
+.tag{display:inline-block;background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:1px 10px;font-size:.8rem;margin-left:6px}
+.msg{white-space:pre-wrap;margin:6px 0 0}[hidden]{display:none!important}.admin-actions{display:flex;gap:10px;align-items:center}.admin-actions button{width:auto;flex:1}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body><main>
+<h1>Painel administrativo</h1>
+<p class="sub">Acesso exclusivo às pessoas autorizadas.</p>
+  <section class="card" id="adminLogin">
+    <h2 style="margin:0 0 6px;font-size:1.15rem">Acesso administrativo</h2>
+    <p class="meta">Área restrita à equipe responsável.</p>
+    <label for="adminEmail">E-mail administrativo</label><input id="adminEmail" type="email" autocomplete="username" placeholder="E-mail de administrador">
+    <label for="adminPassword">Senha</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Sua senha">
+    <button id="entrar">Entrar no painel</button><div class="err" id="loginError"></div>
+  </section>
+
+  <section class="card" id="adm" hidden>
+    <div class="admin-actions"><h2 style="margin:0;font-size:1.15rem;flex:1">Painel de reclamações <span class="meta" id="cont"></span></h2><button class="secondary" id="sair" style="margin:0">Sair</button></div>
+    <label for="busca">Pesquisar</label><input id="busca" type="search" placeholder="Buscar por nome, e-mail ou protocolo">
+    <div id="lista" style="margin-top:8px"><p class="meta">Carregando...</p></div>
+  </section>
+
+<div class="err" id="adminError" role="alert" aria-live="polite"></div>
+</main>
+<script>
+(function(){
+  "use strict";
+  var SUPABASE_URL = "https://ybucnycqdantdggvbvpj.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_Fc3wpHgR97igffUgSK7u0Q_YM6WUihH";
+  var $=function(id){return document.getElementById(id)};
+  var client=null,todas=[],generation=0;
+  function erro(id,msg){$(id).textContent=msg||""}
+  function esc(s){var d=document.createElement("div");d.textContent=String(s==null?"":s);return d.innerHTML}
+  function limpar(){
+    generation++;todas=[];$("lista").textContent="";$("cont").textContent="";
+    $("adminPassword").value="";$("adm").hidden=true;$("adminLogin").hidden=false;
+  }
+  function render(){
+    var q=$("busca").value.trim().toLowerCase(),digits=q.replace(/\D/g,"");
+    var l=todas.filter(function(r){
+      return !q||[r.nome,r.email,r.protocolo,r.assunto,r.texto].some(function(v){return String(v||"").toLowerCase().indexOf(q)>-1})
+        ||(digits&&/^[\d\s.()+-]+$/.test(q)&&[r.cpf,r.telefone].some(function(v){return String(v||"").replace(/\D/g,"").indexOf(digits)>-1}));
+    });
+    $("cont").textContent="("+l.length+" de "+todas.length+")";
+    $("lista").innerHTML=l.length?l.map(function(r){
+      var d=new Date(r.criado_em).toLocaleString("pt-BR");
+      return '<div class="item"><strong>'+esc(r.nome)+'</strong><span class="tag">'+esc(r.assunto)+'</span><div class="meta">'+esc(r.email)+(r.cpf?' · CPF: '+esc(r.cpf):'')+(r.telefone?' · Telefone: '+esc(r.telefone):'')+' · '+esc(d)+' · '+esc(r.protocolo)+'</div><p class="msg">'+esc(r.texto)+'</p></div>';
+    }).join(""):'<p class="meta">Nenhuma manifestação encontrada.</p>';
+  }
+  async function carregarPainel(){
+    limpar();var ticket=generation;
+    try{
+      var session=await client.auth.getSession();
+      if(ticket!==generation||!session.data.session)return;
+      var admin=await client.from("admins").select("user_id").eq("user_id",session.data.session.user.id).maybeSingle();
+      if(ticket!==generation)return;
+      if(admin.error||!admin.data){erro("loginError","Esta conta não tem acesso administrativo.");return}
+      var result=await client.from("complaints").select("id,protocolo,nome,email,cpf,telefone,assunto,texto,criado_em").order("criado_em",{ascending:false});
+      if(ticket!==generation)return;
+      if(result.error)throw result.error;
+      todas=result.data||[];render();$("adm").hidden=false;$("adminLogin").hidden=true;
+    }catch(e){if(ticket===generation)erro("adminError","Não foi possível carregar o painel. Verifique sua conexão e suas permissões.")}
+  }
+  $("busca").addEventListener("input",render);
+  $("entrar").addEventListener("click",async function(){
+    erro("loginError","");erro("adminError","");
+    if(!client){erro("loginError","Não foi possível carregar o sistema. Recarregue a página.");return}
+    var btn=this;btn.disabled=true;btn.textContent="Entrando...";
+    try{
+      var result=await client.auth.signInWithPassword({email:$("adminEmail").value.trim(),password:$("adminPassword").value});
+      $("adminPassword").value="";
+      if(result.error)erro("loginError","Não foi possível entrar. Confira o e-mail e a senha.");
+      else await carregarPainel();
+    }catch(e){erro("loginError","Não foi possível entrar. Tente novamente.")}
+    finally{btn.disabled=false;btn.textContent="Entrar no painel"}
+  });
+  $("sair").addEventListener("click",async function(){
+    limpar();erro("adminError","");
+    try{
+      var result=await client.auth.signOut({scope:"local"});
+      if(result.error)throw result.error;
+    }catch(e){erro("adminError","O painel foi limpo, mas não foi possível encerrar a sessão. Feche esta aba para descartar a sessão local.")}
+  });
+  if(!window.supabase){erro("loginError","Não foi possível carregar o sistema. Recarregue a página.");return}
+  // Sessão apenas nesta aba; nunca é carregada pelo formulário público.
+  client=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{
+    auth:{storage:window.sessionStorage,storageKey:"central-admin-auth",persistSession:true,detectSessionInUrl:false}
+  });
+  client.auth.onAuthStateChange(function(event){if(event==="SIGNED_OUT")limpar()});
+  carregarPainel();
+})();
+</script></body></html>

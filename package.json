@@ -1,0 +1,10 @@
+{
+  "name": "central-de-sugestoes-e-melhorias",
+  "private": true,
+  "scripts": {
+    "test": "node tests/captcha.mjs && node tests/pages.cjs && node tests/migration.cjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.3.14"
+  }
+}

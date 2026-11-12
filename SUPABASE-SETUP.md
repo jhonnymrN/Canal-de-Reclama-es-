@@ -2,6 +2,8 @@
 
 O site estático do GitHub Pages não possui banco de dados nem autenticação próprios. Esta versão usa Supabase para guardar manifestações e proteger o painel administrativo.
 
+> O projeto já está configurado. Para ativar CAPTCHA e consultar o endereço administrativo, siga [CAPTCHA-SETUP.md](CAPTCHA-SETUP.md). Não reexecute o schema durante a ativação: a versão atual fecha INSERT público.
+
 ## 1. Criar o projeto
 1. Acesse https://supabase.com/ e crie uma conta/projeto.
 2. Escolha uma senha forte para o banco e guarde-a em local seguro.
@@ -39,12 +41,12 @@ Somente esse usuário terá acesso ao painel. Para adicionar outro administrador
 
 ## 5. Testar
 1. Abra o site público e envie uma manifestação de teste.
-2. Entre no painel administrativo com o e-mail e a senha criados.
+2. Abra `admin.html` no endereço do site e entre no painel administrativo com o e-mail e a senha criados.
 3. Confirme que a manifestação aparece na lista.
 4. Teste em uma janela anônima: o painel não deve mostrar dados sem autenticação.
 
 ## Privacidade
-O formulário não solicita CPF. Nome e e-mail são suficientes para identificar e responder à manifestação. Defina um prazo de retenção e uma política de privacidade compatíveis com a finalidade do serviço.
+CPF e telefone são opcionais. Colete-os apenas quando necessários para a finalidade da manifestação. Defina um prazo de retenção e uma política de privacidade compatíveis com a finalidade do serviço.
 
 ## Endereço do site
 https://jhonnymrn.github.io/central-de-sugestoes-e-melhorias/

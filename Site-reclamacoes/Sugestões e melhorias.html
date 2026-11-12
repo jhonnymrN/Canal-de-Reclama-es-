@@ -21,6 +21,7 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
 .msg{white-space:pre-wrap;margin:6px 0 0}[hidden]{display:none!important}.admin-actions{display:flex;gap:10px;align-items:center}.admin-actions button{width:auto;flex:1}
 </style>
 <script src="../assets/vendor/cpf-1.0.2.min.js"></script>
+<script src="../assets/captcha-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -36,24 +37,12 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
       <label for="tipo">Assunto</label><select id="tipo"><option>Atendimento</option><option>Conteúdo / aulas</option><option>Professores / instrutores</option><option>Plataforma / acesso</option><option>Financeiro / pagamentos</option><option>Outros</option></select>
       <label for="texto">Descrição</label><textarea id="texto" maxlength="5000" placeholder="Descreva sua sugestão ou melhoria com o máximo de detalhes possível."></textarea><div class="err" id="eTexto"></div>
       <div class="chk"><input type="checkbox" id="lgpd"><label for="lgpd" style="font-weight:400;margin:0">Autorizo o uso dos dados informados neste formulário para identificar e tratar esta manifestação e, se necessário, entrar em contato comigo. CPF e telefone são opcionais.</label></div><div class="err" id="eLgpd"></div>
+      <div id="captcha" style="margin-top:16px"></div><div class="err" id="eCaptcha" aria-live="polite"></div>
       <button id="enviar">Enviar reclamação</button><div class="err" id="eGeral" style="text-align:center;margin-top:10px"></div>
     </div>
     <div id="done" hidden><p class="ok">✔ Reclamação enviada com sucesso!</p><p>Obrigado por nos avisar. Guarde seu protocolo: <strong id="proto"></strong></p><button class="secondary" id="nova">Enviar outra reclamação</button></div>
   </section>
 
-  <section class="card" id="adminLogin">
-    <h2 style="margin:0 0 6px;font-size:1.15rem">Acesso administrativo</h2>
-    <p class="meta">Área restrita à equipe responsável.</p>
-    <label for="adminEmail">E-mail administrativo</label><input id="adminEmail" type="email" autocomplete="username" placeholder="E-mail de administrador">
-    <label for="adminPassword">Senha</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Sua senha">
-    <button id="entrar">Entrar no painel</button><div class="err" id="loginError"></div>
-  </section>
-
-  <section class="card" id="adm" hidden>
-    <div class="admin-actions"><h2 style="margin:0;font-size:1.15rem;flex:1">Painel de reclamações <span class="meta" id="cont"></span></h2><button class="secondary" id="sair" style="margin:0">Sair</button></div>
-    <label for="busca">Pesquisar</label><input id="busca" type="search" placeholder="Buscar por nome, e-mail ou protocolo">
-    <div id="lista" style="margin-top:8px"><p class="meta">Carregando...</p></div>
-  </section>
   <p class="hint" style="text-align:center">As informações enviadas são utilizadas somente para tratar esta manifestação.</p>
 </main>
 <script>
@@ -64,12 +53,11 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
   var SUPABASE_URL = "https://ybucnycqdantdggvbvpj.supabase.co";
   var SUPABASE_ANON_KEY = "sb_publishable_Fc3wpHgR97igffUgSK7u0Q_YM6WUihH";
   var $=function(id){return document.getElementById(id)};
-  var client=null, todas=[], channel=null;
+  var client=null;
   function erro(id,msg){$(id).textContent=msg||""}
-  function esc(s){var d=document.createElement("div");d.textContent=String(s==null?"":s);return d.innerHTML}
   function configurar(){
     if(!window.supabase||SUPABASE_URL.indexOf("https://")!==0||SUPABASE_ANON_KEY.indexOf("COLE_")===0)return false;
-    client=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+    client=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
     return true;
   }
   function protocolo(){return "REC-"+Date.now().toString(36).toUpperCase()+"-"+Math.random().toString(36).slice(2,6).toUpperCase()}
@@ -85,10 +73,48 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
     this.setSelectionRange(caret,caret);
     erro("eCpf","");this.removeAttribute("aria-invalid");
   });
+  var captchaConfig=window.CENTRAL_CAPTCHA||{}, captchaToken="", captchaWidget=null;
+  var captchaEnabled=!!captchaConfig.siteKey;
+  function resetCaptcha(){
+    captchaToken="";
+    if(window.turnstile&&captchaWidget!==null)window.turnstile.reset(captchaWidget);
+  }
+  window.centralCaptchaReady=function(){
+    captchaWidget=window.turnstile.render("#captcha",{
+      sitekey:captchaConfig.siteKey,action:"submit-complaint",language:"pt-br",
+      callback:function(token){captchaToken=token;erro("eCaptcha","")},
+      "expired-callback":function(){captchaToken="";erro("eCaptcha","A verificação expirou. Faça novamente.")},
+      "error-callback":function(){captchaToken="";erro("eCaptcha","Não foi possível verificar. Recarregue a página.")}
+    });
+  };
+  if(captchaEnabled){
+    var script=document.createElement("script");
+    script.src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=centralCaptchaReady&render=explicit";
+    script.async=true;script.defer=true;
+    script.onerror=function(){erro("eCaptcha","Não foi possível carregar a verificação. Recarregue a página.")};
+    document.head.appendChild(script);
+  }
+  async function enviarManifestacao(row){
+    if(!captchaEnabled){
+      // Compatibilidade temporária durante a ativação. Remover após a migração CAPTCHA.
+      var legacy=await client.from("complaints").insert(row);
+      if(legacy.error)throw legacy.error;
+      return row.protocolo;
+    }
+    var response=await fetch(SUPABASE_URL+"/functions/v1/submit-complaint",{
+      method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY},
+      body:JSON.stringify({nome:row.nome,email:row.email,cpf:row.cpf,telefone:row.telefone,assunto:row.assunto,texto:row.texto,consentimento:true,captchaToken:captchaToken})
+    });
+    var data=await response.json();
+    if(!response.ok||!data.protocolo){
+      var failure=new Error("Falha ao enviar");failure.status=response.status;throw failure;
+    }
+    return data.protocolo;
+  }
   var ultimoProtocolo="";
   var old=$("enviar");
   old.addEventListener("click",async function(){
-    ["eNome","eCpf","eEmail","eTexto","eLgpd","eGeral"].forEach(function(id){erro(id,"")});
+    ["eNome","eCpf","eEmail","eTexto","eLgpd","eGeral","eCaptcha"].forEach(function(id){erro(id,"")});
     var nome=$("nome").value.trim().replace(/\s+/g," "),email=$("email").value.trim(),cpf=$("cpf").value.replace(/\D/g,""),telefone=$("telefone").value.replace(/\D/g,""),texto=$("texto").value.trim(),ok=true;
     if(nome.length<5||nome.split(" ").length<2){erro("eNome","Informe seu nome completo.");ok=false}
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){erro("eEmail","Informe um e-mail válido.");ok=false}
@@ -96,68 +122,22 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
     if(telefone&&telefone.length!==10&&telefone.length!==11){erro("eGeral","Informe um telefone com DDD válido ou deixe o campo em branco.");ok=false}
     if(texto.length<20){erro("eTexto","Descreva sua manifestação (mínimo de 20 caracteres).");ok=false}
     if(!$("lgpd").checked){erro("eLgpd","É necessário autorizar o uso dos dados.");ok=false}
+    if(captchaEnabled&&!captchaToken){erro("eCaptcha","Conclua a verificação de segurança antes de enviar.");ok=false}
     if(!ok)return;
     if(!client){erro("eGeral","O sistema ainda está sendo configurado. Tente novamente mais tarde.");return}
     old.disabled=true;old.textContent="Enviando...";ultimoProtocolo=protocolo();
     try{
-      var result=await client.from("complaints").insert({protocolo:ultimoProtocolo,nome:nome,email:email,cpf:cpf||null,telefone:telefone||null,assunto:$("tipo").value,texto:texto});
-      if(result.error)throw result.error;
+      ultimoProtocolo=await enviarManifestacao({protocolo:ultimoProtocolo,nome:nome,email:email,cpf:cpf||null,telefone:telefone||null,assunto:$("tipo").value,texto:texto});
       $("proto").textContent=ultimoProtocolo;$("formBox").hidden=true;$("done").hidden=false;
-    }catch(e){erro("eGeral","Não foi possível enviar. Verifique sua conexão e tente novamente.")}
+    }catch(e){erro("eGeral",e.status===429?"Você enviou várias manifestações em pouco tempo. Aguarde alguns minutos.":e.status===403?"A verificação de segurança falhou. Faça novamente.":"Não foi possível enviar. Verifique sua conexão e tente novamente.")}
+    if(captchaEnabled)resetCaptcha();
     old.disabled=false;old.textContent="Enviar reclamação";
   });
   $("nova").addEventListener("click",function(){
     ["nome","email","cpf","telefone","texto"].forEach(function(id){$(id).value=""});$("lgpd").checked=false;
     $("done").hidden=true;$("formBox").hidden=false;
   });
-  function render(){
-    var q=$("busca").value.trim().toLowerCase();
-    var l=todas.filter(function(r){return !q||[r.nome,r.email,r.cpf,r.telefone,r.protocolo,r.assunto,r.texto].some(function(v){return String(v||"").toLowerCase().indexOf(q)>-1})});
-    $("cont").textContent="("+l.length+" de "+todas.length+")";
-    $("lista").innerHTML=l.length?l.map(function(r){
-      var d=new Date(r.criado_em).toLocaleString("pt-BR");
-      return '<div class="item"><strong>'+esc(r.nome)+'</strong><span class="tag">'+esc(r.assunto)+'</span><div class="meta">'+esc(r.email)+(r.cpf?' · CPF: '+esc(r.cpf):'')+(r.telefone?' · Telefone: '+esc(r.telefone):'')+' · '+esc(d)+' · '+esc(r.protocolo)+'</div><p class="msg">'+esc(r.texto)+'</p></div>';
-    }).join(""):'<p class="meta">Nenhuma reclamação encontrada.</p>';
-  }
-  $("busca").addEventListener("input",render);
-  async function carregarPainel(){
-    var session=await client.auth.getSession();
-    if(!session.data.session)return;
-    var admin=await client.from("admins").select("user_id").eq("user_id",session.data.session.user.id).maybeSingle();
-    if(admin.error||!admin.data){todas=[];$("lista").textContent="";$("adm").hidden=true;$("adminLogin").hidden=false;erro("loginError","Esta conta não tem acesso administrativo.");return}
-    $("adm").hidden=false;$("adminLogin").hidden=true;
-    $("lista").innerHTML='<p class="meta">Carregando reclamações...</p>';
-    var result=await client.from("complaints").select("id,protocolo,nome,email,cpf,telefone,assunto,texto,criado_em").order("criado_em",{ascending:false});
-    if(result.error){$("lista").innerHTML='<p class="err">Não foi possível carregar. Confira se sua conta está cadastrada como administradora.</p>';return}
-    todas=result.data||[];render();
-  }
-  $("entrar").addEventListener("click",async function(){
-    erro("loginError","");
-    if(!client){erro("loginError","O sistema ainda está sendo configurado.");return}
-    var btn=this;btn.disabled=true;btn.textContent="Entrando...";
-    var result=await client.auth.signInWithPassword({email:$("adminEmail").value.trim(),password:$("adminPassword").value});
-    if(result.error){erro("loginError","Não foi possível entrar. Confira o e-mail e a senha.");}
-    else {$("adminPassword").value="";await carregarPainel();}
-    btn.disabled=false;btn.textContent="Entrar no painel";
-  });
-  $("sair").addEventListener("click",async function(){
-    if(channel){await client.removeChannel(channel);channel=null}
-    var result=await client.auth.signOut();
-    if(result.error){erro("loginError","Não foi possível encerrar a sessão. Tente novamente.");return}
-    todas=[];$("lista").textContent="";$("cont").textContent="";$("adminPassword").value="";$("adm").hidden=true;$("adminLogin").hidden=false;
-  });
-  async function iniciar(){
-    if(!configurar()){$("eGeral").textContent="";return}
-    var session=await client.auth.getSession();
-    client.auth.onAuthStateChange(function(event){
-      if(event==="SIGNED_OUT"){
-        todas=[];$("lista").textContent="";$("cont").textContent="";
-        $("adm").hidden=true;$("adminLogin").hidden=false;$("adminPassword").value="";
-      }
-    });
-    if(session.data.session)await carregarPainel();
-  }
-  iniciar().catch(function(){});
+  configurar();
 })();
 </script>
 </body></html>

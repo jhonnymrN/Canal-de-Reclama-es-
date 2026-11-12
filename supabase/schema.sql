@@ -40,17 +40,11 @@ $$;
 revoke all on function public.is_complaints_admin() from public;
 grant execute on function public.is_complaints_admin() to authenticated;
 
--- Qualquer visitante pode enviar uma manifestação. Visitantes não podem ler.
+-- Novas instalações mantêm INSERT fechado: envios passam pela função CAPTCHA.
+-- Após criar as tabelas, aplique migrations/202611120001_captcha_gate.sql
+-- seguindo CAPTCHA-SETUP.md. Não recrie uma política pública de INSERT.
 drop policy if exists "Public can submit complaints" on public.complaints;
-create policy "Public can submit complaints"
-on public.complaints for insert
-to anon, authenticated
-with check (
-  char_length(nome) between 5 and 120
-  and char_length(email) between 5 and 254
-  and char_length(texto) between 20 and 5000
-  and char_length(protocolo) between 5 and 40
-);
+revoke insert on public.complaints from public, anon, authenticated;
 
 drop policy if exists "Admins can read complaints" on public.complaints;
 create policy "Admins can read complaints"
@@ -65,7 +59,6 @@ on public.admins for select
 to authenticated
 using (user_id = (select auth.uid()));
 
-grant insert on public.complaints to anon, authenticated;
 grant select on public.complaints to authenticated;
 grant select on public.admins to authenticated;
 

@@ -1,0 +1,3 @@
+# Endpoint público: valida o token Turnstile no servidor antes de gravar.
+[functions.submit-complaint]
+verify_jwt = false
