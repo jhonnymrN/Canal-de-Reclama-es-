@@ -11,6 +11,10 @@ create table if not exists public.complaints (
   criado_em timestamptz not null default now()
 );
 
+-- Campos opcionais de identificação e contato.
+alter table public.complaints add column if not exists cpf text;
+alter table public.complaints add column if not exists telefone text;
+
 create table if not exists public.admins (
   user_id uuid primary key references auth.users(id) on delete cascade,
   criado_em timestamptz not null default now()
