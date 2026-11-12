@@ -20,6 +20,7 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
 .tag{display:inline-block;background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:1px 10px;font-size:.8rem;margin-left:6px}
 .msg{white-space:pre-wrap;margin:6px 0 0}[hidden]{display:none!important}.admin-actions{display:flex;gap:10px;align-items:center}.admin-actions button{width:auto;flex:1}
 </style>
+<script src="../assets/vendor/cpf-1.0.2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -30,7 +31,7 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
     <div id="formBox">
       <label for="nome">Nome completo</label><input id="nome" autocomplete="name" maxlength="120" placeholder="Digite seu nome completo"><div class="err" id="eNome"></div>
       <label for="email">E-mail</label><input id="email" type="email" autocomplete="email" maxlength="254" placeholder="seuemail@exemplo.com"><div class="err" id="eEmail"></div>
-      <label for="cpf">CPF <span class="meta">(opcional)</span></label><input id="cpf" type="text" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00">
+      <label for="cpf">CPF <span class="meta">(opcional)</span></label><input id="cpf" type="text" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" aria-describedby="eCpf"><div class="err" id="eCpf" aria-live="polite"></div>
       <label for="telefone">Telefone <span class="meta">(opcional)</span></label><input id="telefone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="(00) 00000-0000">
       <label for="tipo">Assunto</label><select id="tipo"><option>Atendimento</option><option>Conteúdo / aulas</option><option>Professores / instrutores</option><option>Plataforma / acesso</option><option>Financeiro / pagamentos</option><option>Outros</option></select>
       <label for="texto">Descrição</label><textarea id="texto" maxlength="5000" placeholder="Descreva sua sugestão ou melhoria com o máximo de detalhes possível."></textarea><div class="err" id="eTexto"></div>
@@ -72,44 +73,26 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
     return true;
   }
   function protocolo(){return "REC-"+Date.now().toString(36).toUpperCase()+"-"+Math.random().toString(36).slice(2,6).toUpperCase()}
-  function validarCPF(v){if(v.length!==11)return false;var s=0;for(var i=0;i<9;i++)s+=Number(v[i])*(10-i);var d=(s*10)%11;if(d===10)d=0;if(d!==Number(v[9]))return false;s=0;for(var j=0;j<10;j++)s+=Number(v[j])*(11-j);d=(s*10)%11;if(d===10)d=0;return d===Number(v[10])}
-  $("enviar").addEventListener("click",async function(){
-    ["eNome","eEmail","eTexto","eLgpd","eGeral"].forEach(function(id){erro(id,"")});
-    var nome=$("nome").value.trim().replace(/\s+/g," "),email=$("email").value.trim(),cpf=$("cpf").value.replace(/\D/g,""),telefone=$("telefone").value.replace(/\D/g,""),texto=$("texto").value.trim(),ok=true;
-    if(nome.length<5||nome.split(" ").length<2){erro("eNome","Informe seu nome completo.");ok=false}
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){erro("eEmail","Informe um e-mail válido.");ok=false}
-    if(cpf&&!validarCPF(cpf)){erro("eGeral","O CPF informado não é válido.");ok=false}
-    if(telefone&&telefone.length!==10&&telefone.length!==11){erro("eGeral","Informe um telefone com DDD válido ou deixe o campo em branco.");ok=false}
-    if(texto.length<20){erro("eTexto","Descreva sua manifestação (mínimo de 20 caracteres).");ok=false}
-    if(!$("lgpd").checked){erro("eLgpd","É necessário autorizar o uso dos dados.");ok=false}
-    if(!ok)return;
-    if(!client){erro("eGeral","O sistema ainda está sendo configurado. Tente novamente mais tarde.");return}
-    var btn=this;btn.disabled=true;btn.textContent="Enviando...";
-    try{
-      var result=await client.from("complaints").insert({protocolo:protocolo(),nome:nome,email:email,cpf:cpf||null,telefone:telefone||null,assunto:$("tipo").value,texto:texto});
-      if(result.error)throw result.error;
-      // O protocolo é gerado novamente somente para exibição? Guardamos o mesmo antes do insert.
-      $("proto").textContent=ultimoProtocolo;
-      $("formBox").hidden=true;$("done").hidden=false;
-    }catch(e){erro("eGeral","Não foi possível enviar. Verifique sua conexão e tente novamente.")}
-    btn.disabled=false;btn.textContent="Enviar reclamação";
+  function validarCPF(v){return !!window.CPF && window.CPF.isValid(v, true)}
+  function mascaraCPF(v){
+    return v.replace(/\D/g,"").slice(0,11).replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+  }
+  $("cpf").addEventListener("input",function(){
+    var pos=this.selectionStart, digits=this.value.slice(0,pos).replace(/\D/g,"").length;
+    this.value=mascaraCPF(this.value);
+    var caret=0,count=0;
+    while(caret<this.value.length&&count<digits){if(/\d/.test(this.value[caret]))count++;caret++}
+    this.setSelectionRange(caret,caret);
+    erro("eCpf","");this.removeAttribute("aria-invalid");
   });
   var ultimoProtocolo="";
-  var inserirOriginal=$("enviar").onclick;
-  // Mantém um protocolo único para o registro e para o comprovante.
-  var enviarOriginal=$("enviar").addEventListener;
-  // Substituição simples do gerador para compartilhar o valor entre gravação e tela.
-  var insertButton=$("enviar");
-  insertButton.removeEventListener("click",function(){});
-  // O listener principal usa este valor, definido antes da requisição por delegação abaixo.
-  // Reatribui o listener de envio para garantir consistência do protocolo.
-  var old=insertButton.cloneNode(true);insertButton.parentNode.replaceChild(old,insertButton);
+  var old=$("enviar");
   old.addEventListener("click",async function(){
-    ["eNome","eEmail","eTexto","eLgpd","eGeral"].forEach(function(id){erro(id,"")});
+    ["eNome","eCpf","eEmail","eTexto","eLgpd","eGeral"].forEach(function(id){erro(id,"")});
     var nome=$("nome").value.trim().replace(/\s+/g," "),email=$("email").value.trim(),cpf=$("cpf").value.replace(/\D/g,""),telefone=$("telefone").value.replace(/\D/g,""),texto=$("texto").value.trim(),ok=true;
     if(nome.length<5||nome.split(" ").length<2){erro("eNome","Informe seu nome completo.");ok=false}
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){erro("eEmail","Informe um e-mail válido.");ok=false}
-    if(cpf&&!validarCPF(cpf)){erro("eGeral","O CPF informado não é válido.");ok=false}
+    if(cpf&&!validarCPF(cpf)){erro("eCpf",window.CPF?"O CPF informado não é válido. Confira os números.":"Não foi possível carregar a validação de CPF. Recarregue a página.");$("cpf").setAttribute("aria-invalid","true");ok=false}
     if(telefone&&telefone.length!==10&&telefone.length!==11){erro("eGeral","Informe um telefone com DDD válido ou deixe o campo em branco.");ok=false}
     if(texto.length<20){erro("eTexto","Descreva sua manifestação (mínimo de 20 caracteres).");ok=false}
     if(!$("lgpd").checked){erro("eLgpd","É necessário autorizar o uso dos dados.");ok=false}
@@ -138,6 +121,10 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
   }
   $("busca").addEventListener("input",render);
   async function carregarPainel(){
+    var session=await client.auth.getSession();
+    if(!session.data.session)return;
+    var admin=await client.from("admins").select("user_id").eq("user_id",session.data.session.user.id).maybeSingle();
+    if(admin.error||!admin.data){todas=[];$("lista").textContent="";$("adm").hidden=true;$("adminLogin").hidden=false;erro("loginError","Esta conta não tem acesso administrativo.");return}
     $("adm").hidden=false;$("adminLogin").hidden=true;
     $("lista").innerHTML='<p class="meta">Carregando reclamações...</p>';
     var result=await client.from("complaints").select("id,protocolo,nome,email,cpf,telefone,assunto,texto,criado_em").order("criado_em",{ascending:false});
@@ -150,16 +137,24 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
     var btn=this;btn.disabled=true;btn.textContent="Entrando...";
     var result=await client.auth.signInWithPassword({email:$("adminEmail").value.trim(),password:$("adminPassword").value});
     if(result.error){erro("loginError","Não foi possível entrar. Confira o e-mail e a senha.");}
-    else await carregarPainel();
+    else {$("adminPassword").value="";await carregarPainel();}
     btn.disabled=false;btn.textContent="Entrar no painel";
   });
   $("sair").addEventListener("click",async function(){
     if(channel){await client.removeChannel(channel);channel=null}
-    await client.auth.signOut();todas=[];$("adm").hidden=true;$("adminLogin").hidden=false;
+    var result=await client.auth.signOut();
+    if(result.error){erro("loginError","Não foi possível encerrar a sessão. Tente novamente.");return}
+    todas=[];$("lista").textContent="";$("cont").textContent="";$("adminPassword").value="";$("adm").hidden=true;$("adminLogin").hidden=false;
   });
   async function iniciar(){
     if(!configurar()){$("eGeral").textContent="";return}
     var session=await client.auth.getSession();
+    client.auth.onAuthStateChange(function(event){
+      if(event==="SIGNED_OUT"){
+        todas=[];$("lista").textContent="";$("cont").textContent="";
+        $("adm").hidden=true;$("adminLogin").hidden=false;$("adminPassword").value="";
+      }
+    });
     if(session.data.session)await carregarPainel();
   }
   iniciar().catch(function(){});
