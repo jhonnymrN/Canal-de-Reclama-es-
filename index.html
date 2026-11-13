@@ -12,9 +12,48 @@
 <script src="assets/vendor/cpf-1.0.2.min.js"></script>
 <script src="assets/captcha-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+.password-recovery{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:20px;background:rgba(18,14,12,.96);backdrop-filter:blur(8px)}
+.password-recovery[hidden],.password-recovery [hidden]{display:none!important}
+.password-card{width:min(480px,100%);padding:28px;background:linear-gradient(150deg,#241e19,#1e1915);border:1px solid #5b4220;border-radius:16px;box-shadow:0 24px 72px rgba(0,0,0,.48);color:#f8f5f2}
+.password-brand{display:inline-flex;align-items:center;padding-bottom:18px;border-bottom:1px solid #3b322b}
+.password-brand img{display:block;width:96px;height:auto}
+.password-kicker{margin:20px 0 5px;color:#ffc24d;font-size:11px;font-weight:750;letter-spacing:.14em;text-transform:uppercase}
+.password-card h1{margin:0 0 8px;color:#f8f5f2;font-size:25px;line-height:1.15;letter-spacing:-.035em}
+.password-card p{color:#b3a698;font-size:13px;line-height:1.5}
+.password-card label{display:block;margin:16px 0 6px;color:#e8dfd5;font-size:12px;font-weight:650}
+.password-card input{width:100%;padding:12px;border:1px solid #493d32;border-radius:9px;background:#120e0c;color:#f8f5f2;font:inherit;font-size:14px}
+.password-card input:focus{outline:2px solid #f59e00;border-color:transparent}
+.password-card button{width:100%;margin-top:18px;padding:12px 16px;border:0;border-radius:9px;background:#f59e00;color:#1e1915;font:inherit;font-size:14px;font-weight:750;cursor:pointer}
+.password-card button:disabled{opacity:.6;cursor:wait}
+.password-error{min-height:1.2em;margin-top:10px;color:#ff929b;font-size:12px}
+.password-done{padding:14px;border:1px solid #355c3f;border-radius:10px;background:rgba(31,122,77,.12);color:#c8eccf;font-size:13px}
+.password-done a{display:inline-block;margin-top:8px;color:#ffc24d;font-weight:700}
+</style>
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><a class="brand" href="./index.html" aria-label="Central de Sugestões e Melhorias - início"><img src="assets/logo-febmg.png" alt="FEBMG"><span class="brand-divider" aria-hidden="true"></span><span><span class="brand-name">Central de Sugestões</span><span class="brand-caption">e melhorias</span></span></a><span class="top-status"><i class="ph ph-shield-check" aria-hidden="true"></i><span class="top-status-text"><span>Ambiente</span><span>seguro</span></span></span></div></header>
+<section class="password-recovery" id="passwordRecovery" hidden aria-label="Redefinição de senha">
+  <div class="password-card">
+    <a class="password-brand" href="/central-de-sugestoes-e-melhorias/" aria-label="FEBMG"><img src="assets/logo-febmg.png" alt="FEBMG"></a>
+    <p class="password-kicker">Recuperação de acesso</p>
+    <div id="passwordRecoveryLoading" role="status">Verificando o link de recuperação…</div>
+    <form id="passwordRecoveryForm" hidden>
+      <h1>Defina uma nova senha</h1>
+      <p>Crie uma senha nova para acessar o painel administrativo. Use pelo menos 12 caracteres.</p>
+      <label for="newAdminPassword">Nova senha</label>
+      <input id="newAdminPassword" type="password" autocomplete="new-password" minlength="12" required>
+      <label for="confirmAdminPassword">Confirme a nova senha</label>
+      <input id="confirmAdminPassword" type="password" autocomplete="new-password" minlength="12" required>
+      <button id="saveNewPassword" type="submit">Salvar nova senha</button>
+      <div class="password-error" id="passwordRecoveryError" role="alert" aria-live="polite"></div>
+    </form>
+    <div class="password-done" id="passwordRecoveryDone" hidden>
+      Senha atualizada. Agora entre novamente no painel.
+      <br><a href="/central-de-sugestoes-e-melhorias/admin.html">Ir para o painel administrativo</a>
+    </div>
+  </div>
+</section>
 <main>
   <div class="page-grid">
     <section class="intro" aria-labelledby="pageTitle">
@@ -74,4 +113,5 @@
   <!-- TODO: adicionar razão social/CNPJ, e-mail do encarregado (DPO) e link da Política de Privacidade quando disponíveis. -->
 </footer>
 <script>document.getElementById('anoAtual').textContent=new Date().getFullYear()</script><script src="assets/js/index.js"></script>
+<script src="assets/js/password-recovery.js"></script>
 </body></html>
