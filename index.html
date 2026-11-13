@@ -4,195 +4,74 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sugestões e melhorias</title>
-<style>
-:root{color-scheme:dark;--bg:#120e0c;--panel:#1e1915;--card:#1e1915;--field:#120e0c;--tx:#f8f5f2;--mu:#b3a698;--bd:#302a25;--accent:#f59e00;--accent-2:#ffc24d;--ok:#9fd6a8;--er:#ff929b;--mint:rgba(245,158,0,.12);font-synthesis:none}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 14% 2%,rgba(245,158,0,.10),transparent 34rem),var(--bg);color:var(--tx);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
-.topbar{height:72px;border-bottom:1px solid var(--bd);background:rgba(13,17,23,.86);display:flex;align-items:center}
-.topbar-inner{width:min(1120px,calc(100% - 40px));margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.brand{display:flex;align-items:center;gap:12px;color:var(--tx);text-decoration:none}
-.brand img{width:112px;height:auto;display:block}.brand-divider{height:28px;width:1px;background:rgba(245,158,0,.42);margin:0 2px}
-.brand-name{font-weight:720;letter-spacing:-.025em;font-size:15px}
-.brand-caption{font-size:11px;color:var(--mu);display:block;margin-top:-2px}
-.top-status{display:flex;align-items:center;gap:8px;font-size:12px;color:#c9b8a8;border:1px solid var(--bd);border-radius:99px;padding:7px 11px}
-.top-status i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);display:block}
-main{width:min(1120px,calc(100% - 40px));margin:0 auto;padding:60px 0 52px}
-.page-grid{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:56px;align-items:start}
-.intro{padding:26px 0 0}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--accent-2);font-size:11px;font-weight:750;letter-spacing:.13em;text-transform:uppercase}
-.eyebrow:before{content:"";width:18px;height:1px;background:var(--accent)}
-h1{font-size:clamp(2.4rem,4.3vw,3.65rem);line-height:1.04;letter-spacing:-.055em;margin:18px 0 17px;max-width:520px}
-h1 em{color:var(--accent);font-style:normal}
-.sub{color:#a4b1ae;font-size:16px;max-width:445px;margin:0}
-.steps{display:grid;gap:0;margin:38px 0 0;max-width:430px}
-.step{display:grid;grid-template-columns:34px 1fr;gap:13px;padding:14px 0;border-top:1px solid rgba(147,161,158,.17)}
-.step-num{font:12px/27px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--accent);width:27px;height:27px;border:1px solid rgba(245,158,0,.35);border-radius:8px;text-align:center}
-.step strong{font-size:13px;display:block;font-weight:650}
-.step span{font-size:12px;color:var(--mu);display:block;margin-top:2px}
-.privacy{display:flex;gap:10px;align-items:flex-start;border:1px solid rgba(147,161,158,.18);border-radius:12px;padding:14px 15px;margin-top:26px;max-width:430px;color:var(--mu);font-size:12px}
-.privacy svg{flex:none;margin-top:1px;color:var(--accent)}
-.card{background:linear-gradient(150deg,rgba(36,30,25,.98),rgba(30,25,21,.98));border:1px solid #3b322b;border-radius:16px;padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.22)}
-.form-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:18px}
-.form-head h2{font-size:19px;letter-spacing:-.025em;margin:0}
-.form-head p{color:var(--mu);font-size:12px;margin:4px 0 0}
-.required-note{font-size:11px;color:var(--mu);white-space:nowrap}
-label{display:block;font-weight:600;font-size:12px;color:#d7e0dd;margin:13px 0 6px}
-input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:9px;background:var(--field);color:var(--tx);font:inherit;font-size:13px;transition:border-color .15s,box-shadow .15s}
-input::placeholder,textarea::placeholder{color:#84786d}
-input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,158,0,.12)}
-select{appearance:auto}
-textarea{min-height:132px;resize:vertical}
-.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
-.hint,.meta{font-size:.82rem;color:var(--mu)}
-.err{color:var(--er);font-size:.8rem;margin-top:4px;min-height:1em}
-.chk{display:flex;gap:10px;align-items:flex-start;margin-top:17px;font-size:11px;color:var(--mu)}
-.chk input{accent-color:var(--accent);width:15px;height:15px;flex:none;margin:2px 0 0}
-.chk label{font-weight:400;font-size:11px;color:var(--mu);margin:0}
-button{margin-top:17px;width:100%;padding:12px 16px;border:1px solid var(--accent);border-radius:9px;background:var(--accent);color:#1e1915;font:inherit;font-size:13px;font-weight:750;cursor:pointer;transition:filter .15s,transform .15s}
-button:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}
-button.secondary{background:transparent;color:var(--tx);border-color:var(--bd)}
-button:disabled{opacity:.55;cursor:not-allowed}
-#captcha{margin-top:15px}
-.ok{color:var(--ok);font-weight:650}
-.item{border-top:1px solid var(--bd);padding:14px 0}.item:first-child{border-top:0}
-.tag{display:inline-block;background:var(--mint);border:1px solid rgba(245,158,0,.25);color:var(--accent-2);border-radius:20px;padding:1px 9px;font-size:.78rem;margin-left:6px}
-.msg{white-space:pre-wrap;margin:6px 0 0}
-.footer{color:#948779;font-size:11px;text-align:center;margin:20px 0 0}
-[hidden]{display:none!important}
-@media(max-width:800px){main{padding:36px 0}.page-grid{grid-template-columns:1fr;gap:28px}.intro{padding:0}.steps{grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}.step{grid-template-columns:1fr;border-top:1px solid rgba(147,161,158,.17);align-content:start}.step span{font-size:11px}.privacy{margin-top:18px}}
-@media(max-width:540px){.topbar{height:64px}.topbar-inner,main{width:calc(100% - 28px)}.brand img{width:92px;height:auto}.brand-divider{height:25px;margin:0}.top-status{font-size:10px;padding:6px 8px}.brand-name{font-size:13px}.brand-caption{font-size:10px}main{padding:28px 0 34px}.page-grid{gap:22px}h1{font-size:2.35rem;margin:13px 0}.sub{font-size:14px}.steps{gap:8px;margin-top:20px}.step{gap:7px;padding:10px 0}.step-num{width:24px;height:24px;line-height:23px}.step strong{font-size:11px}.step span{font-size:10px}.privacy{font-size:11px;padding:11px}.card{padding:19px 16px;border-radius:13px}.form-head h2{font-size:17px}.required-note{font-size:10px}.field-grid{grid-template-columns:1fr}.form-head{gap:8px}}
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="assets/css/index.css">
 <script src="assets/vendor/cpf-1.0.2.min.js"></script>
 <script src="assets/captcha-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<header class="topbar"><div class="topbar-inner"><a class="brand" href="./index.html" aria-label="Central de Sugestões e Melhorias - início"><img src="assets/logo-febmg.png" alt="FEBMG"><span class="brand-divider" aria-hidden="true"></span><span><span class="brand-name">Central de Sugestões</span><span class="brand-caption">e melhorias</span></span></a><span class="top-status"><i></i>Canal oficial</span></div></header>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="./index.html" aria-label="Central de Sugestões e Melhorias - início"><img src="assets/logo-febmg.png" alt="FEBMG"><span class="brand-divider" aria-hidden="true"></span><span><span class="brand-name">Central de Sugestões</span><span class="brand-caption">e melhorias</span></span></a><span class="top-status"><i class="ph ph-shield-check" aria-hidden="true"></i><span class="top-status-text"><span>Ambiente</span><span>seguro</span></span></span></div></header>
 <main>
   <div class="page-grid">
     <section class="intro" aria-labelledby="pageTitle">
-      <span class="eyebrow">Sua voz ajuda a melhorar</span>
-      <h1 id="pageTitle">Uma boa ideia pode mudar <em>tudo.</em></h1>
-      <p class="sub">Conte o que aconteceu ou compartilhe uma sugestão. Nossa equipe vai analisar com atenção e entrar em contato se precisar.</p>
-      <div class="steps" aria-label="Como funciona">
-        <div class="step"><span class="step-num">01</span><div><strong>Conte pra gente</strong><span>Explique sua experiência ou ideia.</span></div></div>
-        <div class="step"><span class="step-num">02</span><div><strong>Nós analisamos</strong><span>Cada manifestação é lida pela equipe.</span></div></div>
-        <div class="step"><span class="step-num">03</span><div><strong>Guarde o protocolo</strong><span>Ele confirma o recebimento.</span></div></div>
-      </div>
-      <div class="privacy"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 19 6v5c0 4.8-3 8-7 10-4-2-7-5.2-7-10V6l7-3Z" stroke="currentColor" stroke-width="1.7"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Seus dados são usados somente para tratar esta manifestação. CPF e telefone são opcionais.</span></div>
-    </section>
+      
+      <h1 id="pageTitle">Sua opinião nos ajuda a construir uma faculdade melhor.</h1>
+      <p class="sub">Conte como tem sido sua experiência na nossa faculdade e o que você acha dela. Sua opinião nos ajuda a melhorar o ensino, o atendimento e a estrutura. Nossa equipe vai ler tudo com atenção.</p>
+      
+       </section>
     <section class="card" id="formCard" aria-labelledby="formTitle">
       <div id="formBox">
-        <div class="form-head"><div><h2 id="formTitle">Enviar manifestação</h2><p>Preencha os campos para registrar seu relato.</p></div><span class="required-note">* Obrigatório</span></div>
+        <div class="form-head"><div><h2 id="formTitle">Compartilhe sua opinião</h2><p>Conte como tem sido sua experiência como aluno(a) da nossa faculdade.</p></div></div>
         <div class="field-grid">
           <div><label for="nome">Nome completo <span aria-hidden="true">*</span></label><input id="nome" autocomplete="name" maxlength="120" placeholder="Digite seu nome completo"><div class="err" id="eNome"></div></div>
           <div><label for="email">E-mail <span aria-hidden="true">*</span></label><input id="email" type="email" autocomplete="email" maxlength="254" placeholder="seuemail@exemplo.com"><div class="err" id="eEmail"></div></div>
           <div><label for="cpf">CPF <span class="meta">(opcional)</span></label><input id="cpf" type="text" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" aria-describedby="eCpf"><div class="err" id="eCpf" aria-live="polite"></div></div>
           <div><label for="telefone">Telefone <span class="meta">(opcional)</span></label><input id="telefone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="(00) 00000-0000"><div class="err" id="eGeral"></div></div>
         </div>
-        <label for="tipo">Assunto <span aria-hidden="true">*</span></label><select id="tipo"><option>Atendimento</option><option>Conteúdo / aulas</option><option>Professores / instrutores</option><option>Plataforma / acesso</option><option>Financeiro / pagamentos</option><option>Outros</option></select>
-        <label for="texto">Descrição <span aria-hidden="true">*</span></label><textarea id="texto" maxlength="5000" placeholder="Descreva sua sugestão ou melhoria com o máximo de detalhes possível."></textarea><div class="err" id="eTexto"></div>
-        <div class="chk"><input type="checkbox" id="lgpd"><label for="lgpd">Autorizo o uso dos dados informados neste formulário para identificar e tratar esta manifestação e, se necessário, entrar em contato comigo. CPF e telefone são opcionais.</label></div><div class="err" id="eLgpd"></div>
+        <label for="tipo">Sobre o que você quer falar? <span aria-hidden="true">*</span></label><select id="tipo"><option>Atendimento</option><option>Conteúdo / aulas</option><option>Professores / instrutores</option><option>Plataforma / acesso</option><option>Financeiro / pagamentos</option><option>Outros</option></select>
+        <label for="texto">Sua experiência e opinião <span aria-hidden="true">*</span></label><textarea id="texto" maxlength="5000" placeholder="Conte como tem sido sua experiência na faculdade: o que você aprova, o que poderia melhorar e o que sugere para a gente."></textarea><div class="err" id="eTexto"></div>
+        <div class="chk"><input type="checkbox" id="lgpd"><label for="lgpd">Autorizo o uso dos dados informados neste formulário para identificar e analisar meu feedback e, se necessário, entrar em contato comigo. CPF e telefone são opcionais.</label></div><div class="err" id="eLgpd"></div>
         <div id="captcha"></div><div class="err" id="eCaptcha" aria-live="polite"></div>
-        <button id="enviar">Enviar manifestação</button><div class="err" id="eGeralForm" style="text-align:center;margin-top:10px"></div>
+        <button id="enviar">Enviar opinião</button><div class="err" id="eGeralForm"></div>
       </div>
-      <div id="done" hidden><p class="ok">✔ Manifestação enviada com sucesso!</p><p>Obrigado por nos avisar. Guarde seu protocolo: <strong id="proto"></strong></p><button class="secondary" id="nova">Enviar outra manifestação</button></div>
+      <div id="done" hidden><p class="ok">✔ Opinião enviada com sucesso!</p><p>Obrigado por compartilhar sua experiência na nossa faculdade. Sua opinião nos ajuda a melhorar. Guarde seu protocolo: <strong id="proto"></strong></p><button class="secondary" id="nova">Enviar outra opinião</button></div>
     </section>
   </div>
-  <p class="footer">Central de Sugestões e Melhorias · Canal seguro e confidencial</p>
-</main><script>
-(function(){
-  "use strict";
-  // Preencha estes dois campos com os dados públicos do seu projeto Supabase.
-  // Nunca coloque aqui a chave service_role ou qualquer senha administrativa.
-  var SUPABASE_URL = "https://ybucnycqdantdggvbvpj.supabase.co";
-  var SUPABASE_ANON_KEY = "sb_publishable_Fc3wpHgR97igffUgSK7u0Q_YM6WUihH";
-  var $=function(id){return document.getElementById(id)};
-  var client=null;
-  function erro(id,msg){$(id).textContent=msg||""}
-  function configurar(){
-    if(!window.supabase||SUPABASE_URL.indexOf("https://")!==0||SUPABASE_ANON_KEY.indexOf("COLE_")===0)return false;
-    client=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
-    return true;
-  }
-  function protocolo(){return "REC-"+Date.now().toString(36).toUpperCase()+"-"+Math.random().toString(36).slice(2,6).toUpperCase()}
-  function validarCPF(v){return !!window.CPF && window.CPF.isValid(v, true)}
-  function mascaraCPF(v){
-    return v.replace(/\D/g,"").slice(0,11).replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");
-  }
-  $("cpf").addEventListener("input",function(){
-    var pos=this.selectionStart, digits=this.value.slice(0,pos).replace(/\D/g,"").length;
-    this.value=mascaraCPF(this.value);
-    var caret=0,count=0;
-    while(caret<this.value.length&&count<digits){if(/\d/.test(this.value[caret]))count++;caret++}
-    this.setSelectionRange(caret,caret);
-    erro("eCpf","");this.removeAttribute("aria-invalid");
-  });
-  var captchaConfig=window.CENTRAL_CAPTCHA||{}, captchaToken="", captchaWidget=null;
-  var captchaEnabled=!!(captchaConfig.enabled&&captchaConfig.siteKey);
-  function resetCaptcha(){
-    captchaToken="";
-    if(window.turnstile&&captchaWidget!==null)window.turnstile.reset(captchaWidget);
-  }
-  window.centralCaptchaReady=function(){
-    captchaWidget=window.turnstile.render("#captcha",{
-      sitekey:captchaConfig.siteKey,action:"submit-complaint",language:"pt-br",
-      callback:function(token){captchaToken=token;erro("eCaptcha","")},
-      "expired-callback":function(){captchaToken="";erro("eCaptcha","A verificação expirou. Faça novamente.")},
-      "error-callback":function(){captchaToken="";erro("eCaptcha","Não foi possível verificar. Recarregue a página.")}
-    });
-  };
-  if(captchaEnabled){
-    var script=document.createElement("script");
-    script.src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=centralCaptchaReady&render=explicit";
-    script.async=true;script.defer=true;
-    script.onerror=function(){erro("eCaptcha","Não foi possível carregar a verificação. Recarregue a página.")};
-    document.head.appendChild(script);
-  }
-  async function enviarManifestacao(row){
-    if(!captchaEnabled){
-      // Compatibilidade temporária durante a ativação. Remover após a migração CAPTCHA.
-      var legacy=await client.from("complaints").insert(row);
-      if(legacy.error)throw legacy.error;
-      return row.protocolo;
-    }
-    var response=await fetch(SUPABASE_URL+"/functions/v1/submit-complaint",{
-      method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY},
-      body:JSON.stringify({nome:row.nome,email:row.email,cpf:row.cpf,telefone:row.telefone,assunto:row.assunto,texto:row.texto,consentimento:true,captchaToken:captchaToken})
-    });
-    var data=await response.json();
-    if(!response.ok||!data.protocolo){
-      var failure=new Error("Falha ao enviar");failure.status=response.status;throw failure;
-    }
-    return data.protocolo;
-  }
-  var ultimoProtocolo="";
-  var old=$("enviar");
-  old.addEventListener("click",async function(){
-    ["eNome","eCpf","eEmail","eTexto","eLgpd","eGeral","eGeralForm","eCaptcha"].forEach(function(id){erro(id,"")});
-    var nome=$("nome").value.trim().replace(/\s+/g," "),email=$("email").value.trim(),cpf=$("cpf").value.replace(/\D/g,""),telefone=$("telefone").value.replace(/\D/g,""),texto=$("texto").value.trim(),ok=true;
-    if(nome.length<5||nome.split(" ").length<2){erro("eNome","Informe seu nome completo.");ok=false}
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){erro("eEmail","Informe um e-mail válido.");ok=false}
-    if(cpf&&!validarCPF(cpf)){erro("eCpf",window.CPF?"O CPF informado não é válido. Confira os números.":"Não foi possível carregar a validação de CPF. Recarregue a página.");$("cpf").setAttribute("aria-invalid","true");ok=false}
-    if(telefone&&telefone.length!==10&&telefone.length!==11){erro("eGeralForm","Informe um telefone com DDD válido ou deixe o campo em branco.");ok=false}
-    if(texto.length===0){erro("eTexto","Descreva sua manifestação.");ok=false}
-    if(!$("lgpd").checked){erro("eLgpd","É necessário autorizar o uso dos dados.");ok=false}
-    if(captchaEnabled&&!captchaToken){erro("eCaptcha","Conclua a verificação de segurança antes de enviar.");ok=false}
-    if(!ok)return;
-    if(!client){erro("eGeralForm","O sistema ainda está sendo configurado. Tente novamente mais tarde.");return}
-    old.disabled=true;old.textContent="Enviando...";ultimoProtocolo=protocolo();
-    try{
-      ultimoProtocolo=await enviarManifestacao({protocolo:ultimoProtocolo,nome:nome,email:email,cpf:cpf||null,telefone:telefone||null,assunto:$("tipo").value,texto:texto});
-      $("proto").textContent=ultimoProtocolo;$("formBox").hidden=true;$("done").hidden=false;
-    }catch(e){erro("eGeralForm",e.status===429?"Você enviou várias manifestações em pouco tempo. Aguarde alguns minutos.":e.status===403?"A verificação de segurança falhou. Faça novamente.":"Não foi possível enviar. Verifique sua conexão e tente novamente.")}
-    if(captchaEnabled)resetCaptcha();
-    old.disabled=false;old.textContent="Enviar manifestação";
-  });
-  $("nova").addEventListener("click",function(){
-    ["nome","email","cpf","telefone","texto"].forEach(function(id){$(id).value=""});$("lgpd").checked=false;
-    $("done").hidden=true;$("formBox").hidden=false;
-  });
-  configurar();
-})();
-</script>
+</main>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col footer-about">
+        <a class="footer-brand" href="./index.html" aria-label="Central de Sugestões e Melhorias - início"><img src="assets/logo-febmg.png" alt="FEBMG"></a>
+        <p>Canal oficial da nossa faculdade para você compartilhar elogios, sugestões e pontos de melhoria.</p>
+      </div>
+      <div class="footer-col">
+        <h2>Como tratamos sua opinião</h2>
+        <ul>
+          <li>Cada envio gera um protocolo para acompanhamento.</li>
+          <li>Nossa equipe lê cada manifestação com atenção.</li>
+          <li>Canal seguro e confidencial.</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h2>Seus dados (LGPD)</h2>
+        <ul>
+          <li>Usamos os dados apenas para identificar e analisar seu feedback.</li>
+          <li>CPF e telefone são opcionais.</li>
+          <li>Você pode pedir acesso, correção ou exclusão dos seus dados, conforme o art. 18 da <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">Lei nº 13.709/2018</a>.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© <span id="anoAtual">2026</span> FEBMG. Todos os direitos reservados.</p>
+      <p>Central de Sugestões e Melhorias</p>
+    </div>
+  </div>
+  <!-- TODO: adicionar razão social/CNPJ, e-mail do encarregado (DPO) e link da Política de Privacidade quando disponíveis. -->
+</footer>
+<script>document.getElementById('anoAtual').textContent=new Date().getFullYear()</script><script src="assets/js/index.js"></script>
 </body></html>
