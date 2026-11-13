@@ -7,29 +7,34 @@
 <meta name="referrer" content="no-referrer">
 <title>Painel administrativo — Central de Sugestões</title>
 <style>
-:root{--bg:#f4f6fb;--card:#fff;--tx:#1b2233;--mu:#5d667a;--bd:#d9deea;--ac:#2f5bea;--ok:#127a4b;--er:#c0262d;box-sizing:border-box}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141f;--card:#1a2030;--tx:#e8ecf6;--mu:#98a2b8;--bd:#2b3348;--ac:#6f8dff;--ok:#4cc38a;--er:#ff7a80;color-scheme:dark}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:640px;margin:0 auto;padding:24px 16px 48px}h1{font-size:1.6rem;margin:8px 0 4px}.sub{color:var(--mu);margin:0 0 20px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:16px}
-label{display:block;font-weight:600;margin:14px 0 6px}input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--ac);border-color:transparent}textarea{min-height:160px;resize:vertical}
-.hint,.meta{font-size:.85rem;color:var(--mu)}.err{color:var(--er);font-size:.85rem;margin-top:4px;min-height:1em}
-.chk{display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:.9rem;color:var(--mu)}.chk input{width:auto;margin-top:4px}
-button{margin-top:18px;width:100%;padding:13px;border:0;border-radius:10px;background:var(--ac);color:white;font:inherit;font-weight:700;cursor:pointer}
-button.secondary{background:transparent;color:var(--tx);border:1px solid var(--bd)}button:disabled{opacity:.5;cursor:not-allowed}
-.ok{color:var(--ok);font-weight:600}.item{border-top:1px solid var(--bd);padding:14px 0}.item:first-child{border-top:0}
-.tag{display:inline-block;background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:1px 10px;font-size:.8rem;margin-left:6px}
-.msg{white-space:pre-wrap;margin:6px 0 0}[hidden]{display:none!important}.admin-actions{display:flex;gap:10px;align-items:center}.admin-actions button{width:auto;flex:1}
+:root{color-scheme:dark;--bg:#0d1117;--card:#151d26;--field:#0d141b;--tx:#eef4f1;--mu:#93a19e;--bd:#29363a;--accent:#53dfaa;--ok:#62e6a7;--er:#ff929b}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 14% 2%,rgba(53,113,98,.18),transparent 34rem),var(--bg);color:var(--tx);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.topbar{height:72px;border-bottom:1px solid var(--bd);background:rgba(13,17,23,.9);display:flex;align-items:center}.topbar-inner{width:min(1120px,calc(100% - 40px));margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:12px;color:var(--tx);text-decoration:none}.brand img{width:38px;height:38px}.brand-name{font-weight:720;letter-spacing:-.025em;font-size:15px;display:block}.brand-caption{font-size:11px;color:var(--mu);display:block;margin-top:-2px}
+.top-status{display:flex;align-items:center;gap:8px;font-size:12px;color:#b7c4c0;border:1px solid var(--bd);border-radius:99px;padding:7px 11px}.top-status i{width:7px;height:7px;border-radius:50%;background:var(--accent);display:block}
+main{width:min(1000px,calc(100% - 40px));margin:0 auto;padding:52px 0 56px}.admin-heading{margin-bottom:25px}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-size:11px;font-weight:750;letter-spacing:.13em;text-transform:uppercase}.eyebrow:before{content:"";width:18px;height:1px;background:var(--accent)}
+h1{font-size:clamp(2rem,4vw,2.7rem);line-height:1.08;letter-spacing:-.05em;margin:13px 0 8px}.sub{color:var(--mu);margin:0}
+.card{background:linear-gradient(150deg,rgba(24,34,43,.98),rgba(17,24,32,.98));border:1px solid #2b3940;border-radius:15px;padding:25px;box-shadow:0 20px 60px rgba(0,0,0,.2);margin-bottom:16px}
+.login-card{max-width:520px}label{display:block;font-weight:600;font-size:12px;color:#d7e0dd;margin:15px 0 6px}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:9px;background:var(--field);color:var(--tx);font:inherit;font-size:13px}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px rgba(83,223,170,.12)}
+.hint,.meta{font-size:.82rem;color:var(--mu)}.err{color:var(--er);font-size:.82rem;margin-top:5px;min-height:1em}
+button{margin-top:17px;padding:11px 15px;border:1px solid var(--accent);border-radius:9px;background:var(--accent);color:#08130f;font:inherit;font-size:13px;font-weight:750;cursor:pointer}
+button:hover:not(:disabled){filter:brightness(1.08)}button.secondary{background:transparent;color:var(--tx);border-color:var(--bd)}button:disabled{opacity:.55;cursor:not-allowed}
+.ok{color:var(--ok);font-weight:650}.item{border-top:1px solid var(--bd);padding:16px 0}.item:first-child{border-top:0}
+.tag{display:inline-block;background:rgba(83,223,170,.1);border:1px solid rgba(83,223,170,.24);color:#9bf2cd;border-radius:20px;padding:1px 9px;font-size:.78rem;margin-left:6px}
+.msg{white-space:pre-wrap;margin:6px 0 0}[hidden]{display:none!important}
+.admin-actions{display:flex;gap:10px;align-items:center}.admin-actions button{width:auto;flex:0 0 auto}.footer{color:#778681;font-size:11px;text-align:center;margin-top:18px}
+@media(max-width:560px){.topbar{height:64px}.topbar-inner,main{width:calc(100% - 28px)}main{padding:34px 0}.brand img{width:34px;height:34px}.brand-name{font-size:13px}.brand-caption{font-size:10px}.top-status{font-size:10px;padding:6px 8px}.card{padding:19px 16px}.admin-actions{align-items:flex-start;flex-wrap:wrap}.admin-actions h2{min-width:60%}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body><main>
-<h1>Painel administrativo</h1>
-<p class="sub">Acesso exclusivo às pessoas autorizadas.</p>
-  <section class="card" id="adminLogin">
+<body><header class="topbar"><div class="topbar-inner"><a class="brand" href="index.html" aria-label="Central de Sugestões e Melhorias - início"><img src="assets/logo-central.svg" alt=""><span><span class="brand-name">Central de Sugestões</span><span class="brand-caption">e melhorias</span></span></a><span class="top-status"><i></i>Área protegida</span></div></header>
+<main>
+<div class="admin-heading"><span class="eyebrow">Workspace privado</span><h1>Painel administrativo</h1><p class="sub">Acesso exclusivo às pessoas autorizadas.</p></div>
+  <section class="card login-card" id="adminLogin">
     <h2 style="margin:0 0 6px;font-size:1.15rem">Acesso administrativo</h2>
-    <p class="meta">Área restrita à equipe responsável.</p>
+    <p class="meta">Somente administradores cadastrados podem consultar as manifestações.</p>
     <label for="adminEmail">E-mail administrativo</label><input id="adminEmail" type="email" autocomplete="username" placeholder="E-mail de administrador">
     <label for="adminPassword">Senha</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Sua senha">
     <button id="entrar">Entrar no painel</button><div class="err" id="loginError"></div>
@@ -42,6 +47,7 @@ button.secondary{background:transparent;color:var(--tx);border:1px solid var(--b
   </section>
 
 <div class="err" id="adminError" role="alert" aria-live="polite"></div>
+<p class="footer">Central de Sugestões e Melhorias · dados visíveis apenas para a equipe autorizada</p>
 </main>
 <script>
 (function(){
